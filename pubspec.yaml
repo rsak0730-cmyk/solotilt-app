@@ -1,5 +1,5 @@
 name: solotilt_app
-description: Native Android live wallpaper app with tilt effects like solotilt.com
+description: Native Android app with tilt effects
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,13 +10,12 @@ dependencies:
   flutter:
     sdk: flutter
   sensors_plus: ^4.0.2
-  image_picker: ^1.0.7
-  shared_preferences: ^2.2.2
-  path_provider: ^2.1.2
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true
