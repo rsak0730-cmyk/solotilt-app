@@ -1,24 +1,25 @@
-# SoloTilt App
+# Solo Tilt - Native Android App
 
-A native mobile app with tilt/gyroscope effects similar to solotilt.com.
+Native Android app with tilt effects and custom image upload - like solotilt.com!
 
 ## Features
-- 🎨 Tilt-responsive visual effects
-- 📱 Works on Android & iOS
+
+- 🖼️ Custom image upload from gallery
+- 📱 Tilt-responsive depth & blur effects
+- 🎨 Sensitivity control
+- 💾 Saves your custom image
 - 🔓 100% Free (MIT License)
-- ⚡ GPU-accelerated smooth animations
 
-## Screenshots
-Add screenshots here after building the app.
+## Build
 
-## Build Instructions
+### GitHub Actions (No Computer)
+1. Go to **Actions** tab
+2. Click **"Build APK"**
+3. Click **"Run workflow"**
+4. Wait 5-10 minutes
+5. Download APK from **Artifacts**
 
-### Prerequisites
-1. Install Flutter: https://docs.flutter.dev/get-started/install
-2. Install Android Studio or VS Code with Flutter extension
-3. Connect your Android/iOS device or use an emulator
-
-### Clone Repository
+### Manual Build
 ```bash
-git clone [https://github.com/rsak0730-cmyk/solotilt-app.git](https://github.com/rsak0730-cmyk/solotilt-app.git)
-cd solotilt-app
+flutter pub get
+flutter build apk --release
