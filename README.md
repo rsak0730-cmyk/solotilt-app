@@ -20,5 +20,5 @@ Add screenshots here after building the app.
 
 ### Clone Repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/solotilt-app.git](https://github.com/YOUR_USERNAME/solotilt-app.git)
+git clone [https://github.com/rsak0730-cmyk/solotilt-app.git](https://github.com/rsak0730-cmyk/solotilt-app.git)
 cd solotilt-app
