@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   sensors_plus: ^4.0.2
-  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:
