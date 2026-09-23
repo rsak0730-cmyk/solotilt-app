@@ -1,25 +1,17 @@
-# Solo Tilt - Native Android App
+# Solo Tilt
 
-Native Android app with tilt effects and custom image upload - like solotilt.com!
+A Flutter app that creates a dynamic gradient tilt effect using the device gyroscope.
 
 ## Features
 
-- 🖼️ Custom image upload from gallery
-- 📱 Tilt-responsive depth & blur effects
-- 🎨 Sensitivity control
-- 💾 Saves your custom image
-- 🔓 100% Free (MIT License)
+- Real-time gyroscope movement
+- Dynamic 3D tilt
+- Multiple gradient presets
+- Immersive fullscreen mode
+- Android APK build through GitHub Actions
 
 ## Build
 
-### GitHub Actions (No Computer)
-1. Go to **Actions** tab
-2. Click **"Build APK"**
-3. Click **"Run workflow"**
-4. Wait 5-10 minutes
-5. Download APK from **Artifacts**
+Open GitHub Actions and run the Build APK workflow.
 
-### Manual Build
-```bash
-flutter pub get
-flutter build apk --release
+The generated APK will be available as a workflow artifact.
