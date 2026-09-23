@@ -1,12 +1,20 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'dart:math' as math;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+  );
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   runApp(const SoloTiltApp());
 }
 
@@ -35,125 +43,146 @@ class TiltScreen extends StatefulWidget {
 }
 
 class _TiltScreenState extends State<TiltScreen> {
-  double _tiltX = 0;
-  double _tiltY = 0;
-  int _selectedPreset = 0;
-  double _sensitivity = 1.0;
-  bool _blurEnabled = true;
+  int _preset = 0;
 
-  // Pre-bundled gradient presets (no image picker needed!)
   final List<List<Color>> _presets = [
-    [const Color(0xFF667eea), const Color(0xFF764ba2)], // Purple
-    [const Color(0xFFf093fb), const Color(0xFFf5576c)], // Pink
-    [const Color(0xFF4facfe), const Color(0xFF00f2fe)], // Blue
-    [const Color(0xFF43e97b), const Color(0xFF38f9d7)], // Green
-    [const Color(0xFFfa709a), const Color(0xFFfee140)], // Sunset
+    [
+      Color(0xFF667EEA),
+      Color(0xFF764BA2),
+    ],
+    [
+      Color(0xFFF093FB),
+      Color(0xFFF5576C),
+    ],
+    [
+      Color(0xFF4FACFE),
+      Color(0xFF00F2FE),
+    ],
+    [
+      Color(0xFF43E97B),
+      Color(0xFF38F9D7),
+    ],
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          StreamBuilder<GyroscopeEvent>(
-            stream: gyroscopeEventStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                setState(() {
-                  _tiltX = (snapshot.data!.x * _sensitivity).clamp(-30.0, 30.0);
-                  _tiltY = (snapshot.data!.y * _sensitivity).clamp(-30.0, 30.0);
-                });
-              }
-              return Container();
-            },
-          ),
-          
-          _buildBackgroundLayer(),
-          _buildForegroundLayer(),
-          
-          Positioned(
-            top: 40,
-            right: 20,
-            child: IconButton(
-              icon: const Icon(Icons.palette, color: Colors.white, size: 32),
-              onPressed: _showPresets,
+      body: StreamBuilder<GyroscopeEvent>(
+        stream: gyroscopeEventStream(),
+        builder: (context, snapshot) {
+          double x = 0;
+          double y = 0;
+
+          if (snapshot.hasData) {
+            x = snapshot.data!.x.clamp(-5.0, 5.0);
+            y = snapshot.data!.y.clamp(-5.0, 5.0);
+          }
+
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: _buildTiltBackground(x, y),
+              ),
+
+              Positioned(
+                top: 35,
+                right: 12,
+                child: SafeArea(
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.palette_rounded,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: _showPresets,
+                  ),
+                ),
+              ),
+
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 35,
+                child: SafeArea(
+                  child: Center(
+                    child: Text(
+                      'SOLO TILT',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        letterSpacing: 4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTiltBackground(double x, double y) {
+    final normalizedX = (x / 5).clamp(-1.0, 1.0);
+    final normalizedY = (y / 5).clamp(-1.0, 1.0);
+
+    final rotationX =
+        -normalizedY * 0.12;
+
+    final rotationY =
+        normalizedX * 0.12;
+
+    final scale =
+        1.08 +
+        (normalizedX.abs() + normalizedY.abs()) * 0.015;
+
+    return ClipRect(
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..rotateX(rotationX)
+          ..rotateY(rotationY)
+          ..scale(scale),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _presets[_preset],
             ),
           ),
-        ],
-      ),
-    );
-  }
+          child: Stack(
+            children: [
+              Positioned(
+                left: -100 + normalizedX * 100,
+                top: -100 + normalizedY * 100,
+                child: Container(
+                  width: 400,
+                  height: 400,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.12),
+                  ),
+                ),
+              ),
 
-  Widget _buildBackgroundLayer() {
-    final maxTilt = 30.0;
-    final normalizedY = _tiltY / maxTilt;
-    final normalizedX = _tiltX / maxTilt;
-    final rotateY = normalizedY * 15.0;
-    final rotateX = -normalizedX * 15.0;
-    final blur = _blurEnabled ? math.max(0, normalizedY.abs() * 5.0) : 0;
-
-    return Positioned.fill(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: _presets[_selectedPreset],
-          ),
-        ),
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..rotateX(rotateX * math.pi / 180.0)
-            ..rotateY(rotateY * math.pi / 180.0)
-            ..scale(1.05),
-          child: blur > 0
-              ? ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-                  child: Container(),
-                )
-              : Container(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildForegroundLayer() {
-    final maxTilt = 30.0;
-    final normalizedY = _tiltY / maxTilt;
-    final normalizedX = _tiltX / maxTilt;
-    final rotateY = normalizedY * 20.0;
-    final rotateX = -normalizedX * 20.0;
-    final blur = _blurEnabled ? math.max(0, normalizedY.abs() * 8.0) : 0;
-
-    return Positioned.fill(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              _presets[_selectedPreset][0].withOpacity(0.6),
-              _presets[_selectedPreset][1].withOpacity(0.6),
+              Positioned(
+                right: -120 - normalizedX * 120,
+                bottom: -100 - normalizedY * 100,
+                child: Container(
+                  width: 450,
+                  height: 450,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.12),
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..rotateX(rotateX * math.pi / 180.0)
-            ..rotateY(rotateY * math.pi / 180.0)
-            ..scale(1.03),
-          child: blur > 0
-              ? ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-                  child: Container(),
-                )
-              : Container(),
         ),
       ),
     );
@@ -162,67 +191,74 @@ class _TiltScreenState extends State<TiltScreen> {
   void _showPresets() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Choose Background',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 15,
-              runSpacing: 15,
-              children: List.generate(
-                _presets.length,
-                (index) => GestureDetector(
-                  onTap: () {
-                    setState(() => _selectedPreset = index);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _selectedPreset == index ? Colors.white : Colors.transparent,
-                        width: 3,
-                      ),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: _presets[index],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            
-            // Sensitivity slider
-            const Text('Sensitivity'),
-            Slider(
-              value: _sensitivity,
-              min: 0.5,
-              max: 2.0,
-              divisions: 15,
-              label: _sensitivity.toStringAsFixed(1),
-              onChanged: (value) => setState(() => _sensitivity = value),
-            ),
-            
-            // Blur toggle
-            SwitchListTile(
-              title: const Text('Enable Blur'),
-              value: _blurEnabled,
-              onChanged: (value) => setState(() => _blurEnabled = value),
-            ),
-          ],
+      backgroundColor: const Color(0xFF171717),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
         ),
       ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Choose Background',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: List.generate(
+                    _presets.length,
+                    (index) {
+                      final selected = _preset == index;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _preset = index;
+                          });
+
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 75,
+                          height: 75,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: selected
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: _presets[index],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
