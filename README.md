@@ -8,15 +8,17 @@ A native mobile app with tilt/gyroscope effects similar to solotilt.com.
 - 🔓 100% Free (MIT License)
 - ⚡ GPU-accelerated smooth animations
 
+## Screenshots
+Add screenshots here after building the app.
+
 ## Build Instructions
 
 ### Prerequisites
-- Install Flutter: https://docs.flutter.dev/get-started/install
-- Android Studio or VS Code with Flutter extension
+1. Install Flutter: https://docs.flutter.dev/get-started/install
+2. Install Android Studio or VS Code with Flutter extension
+3. Connect your Android/iOS device or use an emulator
 
-### Clone & Run
+### Clone Repository
 ```bash
 git clone [https://github.com/YOUR_USERNAME/solotilt-app.git](https://github.com/YOUR_USERNAME/solotilt-app.git)
 cd solotilt-app
-flutter pub get
-flutter run
