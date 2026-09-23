@@ -42,13 +42,6 @@ class TiltLayer extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: colors,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
         ),
         child: Transform(
           alignment: Alignment.center,
