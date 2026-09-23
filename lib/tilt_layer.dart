@@ -17,17 +17,20 @@ class TiltLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double maxTilt = 30;
+    final double maxTilt = 30.0;
+    
     final double normalizedTiltY = tiltY / maxTilt;
     final double normalizedTiltX = tiltX / maxTilt;
     
-    // Calculate rotation and scale
-    final double rotateY = normalizedTiltY * 20;
-    final double rotateX = -normalizedTiltX * 20;
+    final double rotateY = normalizedTiltY * 20.0;
+    final double rotateX = -normalizedTiltX * 20.0;
+    
     final double scale = 1.05 - (layerIndex * 0.02);
     
-    // Calculate blur based on tilt
-    final double blurAmount = math.max(0, normalizedTiltY.abs() * 8 * (1 - layerIndex * 0.5));
+    final double blurAmount = math.max(
+      0,
+      normalizedTiltY.abs() * 8.0 * (1.0 - layerIndex * 0.5),
+    );
     
     return Positioned.fill(
       child: AnimatedContainer(
@@ -41,7 +44,7 @@ class TiltLayer extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -51,12 +54,15 @@ class TiltLayer extends StatelessWidget {
           alignment: Alignment.center,
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.001)
-            ..rotateX(rotateX * math.pi / 180)
-            ..rotateY(rotateY * math.pi / 180)
+            ..rotateX(rotateX * math.pi / 180.0)
+            ..rotateY(rotateY * math.pi / 180.0)
             ..scale(scale),
           child: blurAmount > 0
               ? ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: blurAmount,
+                    sigmaY: blurAmount,
+                  ),
                   child: Container(),
                 )
               : Container(),
