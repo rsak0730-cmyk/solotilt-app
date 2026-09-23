@@ -1,8 +1,8 @@
+.dart_tool/
 .pub/
 build/
-.dart_tool/
+.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
 .DS_Store
